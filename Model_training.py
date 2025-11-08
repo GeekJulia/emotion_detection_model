@@ -17,7 +17,7 @@ from tqdm import tqdm
 # -------- CONFIG --------
 DATA_ROOT = "datasets"
 FER_ROOT = os.path.join(DATA_ROOT, "fer2013")  # if using FER2013 csv
-SAMPLE_ROOT = os.path.join(DATA_ROOT, "sample_faces")  # optional tiny dataset (ImageFolder)
+SAMPLE_ROOT = os.path.join(DATA_ROOT, "samplefaces")  # optional tiny dataset (ImageFolder)
 MODEL_OUT = "model.pth"
 BATCH_SIZE = 64
 LR = 1e-3

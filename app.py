@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime
 from PIL import Image
 import numpy as np
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 import torch
 import torch.nn as nn
 from torchvision import transforms
@@ -110,7 +110,7 @@ def load_model(path=MODEL_PATH):
     model.eval()
     return model
 
-app = Flask(__name__, static_folder='.', template_folder='.')
+app = Flask(__name__, template_folder='templates')
 
 model = load_model()
 init_db()
@@ -118,7 +118,7 @@ init_db()
 # -------- ROUTES --------
 @app.route('/')
 def index():
-    return send_from_directory(".", "index.html")
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -173,5 +173,4 @@ def history():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    # For production use gunicorn: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2
     app.run(host="0.0.0.0", port=port, debug=True)
