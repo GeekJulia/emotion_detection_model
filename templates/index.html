@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset="utf-8"/>
+  <title>Emotion Detector</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 760px; margin: 30px auto; padding: 0 16px; }
+    #preview { max-width: 320px; display:block; margin-top: 10px; border-radius:8px; }
+    #video { width: 320px; border-radius:8px; }
+    .controls { margin-top: 12px; }
+    .result { margin-top: 18px; font-size: 18px; }
+    button { padding: 8px 12px; margin-right: 6px; }
+    #history { margin-top: 10px; max-height: 200px; overflow:auto; background:#f8f8f8; padding:8px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <h1>Emotion Detector (FER)</h1>
+  <p>Choose an image or use your webcam. The model will respond with a short mood message (e.g. <em>"You are happy😂"</em>).</p>
+
+  <input type="file" id="fileInput" accept="image/*"/>
+  <img id="preview" src="" alt="" style="display:none;"/>
+
+  <div style="margin-top:14px;">
+    <video id="video" autoplay playsinline></video>
+    <div class="controls">
+      <button id="startCam">Start Camera</button>
+      <button id="snapBtn">Capture & Predict</button>
+      <button id="stopCam">Stop Camera</button>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+    <button id="uploadBtn">Upload Selected Image</button>
+  </div>
+
+  <div class="result" id="resultArea"></div>
+
+  <hr/>
+  <h3>Recent predictions</h3>
+  <div id="history"></div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const uploadBtn = document.getElementById('uploadBtn');
+const resultArea = document.getElementById('resultArea');
+const historyDiv = document.getElementById('history');
+
+const video = document.getElementById('video');
+const startCam = document.getElementById('startCam');
+const stopCam = document.getElementById('stopCam');
+const snapBtn = document.getElementById('snapBtn');
+
+let stream = null;
+
+fileInput.onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  preview.src = URL.createObjectURL(f);
+  preview.style.display = 'block';
+}
+
+uploadBtn.onclick = async () => {
+  const f = fileInput.files[0];
+  if (!f) { alert("Pick an image first"); return; }
+  await submitFile(f);
+}
+
+startCam.onclick = async () => {
+  if (stream) return;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    video.srcObject = stream;
+  } catch (e) {
+    alert("Could not start camera: " + e.message);
+  }
+}
+
+stopCam.onclick = () => {
+  if (!stream) return;
+  stream.getTracks().forEach(t => t.stop());
+  stream = null;
+  video.srcObject = null;
+}
+
+snapBtn.onclick = async () => {
+  if (!stream) { alert("Start the camera first"); return; }
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  canvas.toBlob(async (blob) => {
+    // show preview
+    preview.src = URL.createObjectURL(blob);
+    preview.style.display = 'block';
+    const file = new File([blob], "snapshot.png", { type: "image/png" });
+    await submitFile(file);
+  }, 'image/png');
+}
+
+async function submitFile(file) {
+  resultArea.textContent = "Predicting...";
+  const form = new FormData();
+  form.append('file', file);
+  try {
+    const res = await fetch('/predict', { method: 'POST', body: form });
+    if (!res.ok) {
+      const err = await res.json();
+      resultArea.textContent = 'Error: ' + (err.error || 'unknown');
+      return;
+    }
+    const data = await res.json();
+    resultArea.innerHTML = `<strong>${data.mood_message}</strong><br/>Emotion: ${data.emotion} (confidence ${(data.confidence*100).toFixed(1)}%)`;
+    loadHistory();
+  } catch (err) {
+    resultArea.textContent = "Network error: " + err.message;
+  }
+}
+
+async function loadHistory() {
+  try {
+    const res = await fetch('/history');
+    if (!res.ok) return;
+    const arr = await res.json();
+    historyDiv.innerHTML = '';
+    for (const item of arr) {
+      const d = document.createElement('div');
+      d.textContent = `${item.timestamp} — ${item.filename} => ${item.predicted_emotion} (${(item.confidence*100).toFixed(1)}%)`;
+      historyDiv.appendChild(d);
+    }
+  } catch (e) { /* ignore */ }
+}
+
+loadHistory();
+</script>
+</body>
+</html>
