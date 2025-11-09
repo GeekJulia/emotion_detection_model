@@ -1,0 +1,133 @@
+/* ===== Theme Colors ===== */
+:root {
+  --deep-purple: #4A148C;
+  --light-purple: #EDE7F6;
+  --text-dark: #2E2E2E;
+  --text-light: #FFFFFF;
+  --gray-bg: #F9F9F9;
+  --border-radius: 10px;
+}
+
+/* ===== Global Layout ===== */
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  background: var(--gray-bg);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 750px;
+  margin: 40px auto;
+  padding: 20px;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* ===== Header ===== */
+header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+h1 {
+  color: var(--deep-purple);
+  margin-bottom: 8px;
+}
+
+/* ===== Upload Section ===== */
+.upload-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#preview {
+  max-width: 320px;
+  display: block;
+  margin: 15px auto;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===== Buttons ===== */
+button {
+  background: #ddd;
+  border: none;
+  padding: 10px 14px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #ccc;
+}
+
+.primary-btn {
+  background: var(--deep-purple);
+  color: var(--text-light);
+}
+
+.primary-btn:hover {
+  background: #6A1B9A;
+}
+
+/* ===== Camera Section ===== */
+.camera-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#video {
+  width: 320px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.controls {
+  margin-top: 12px;
+}
+
+/* ===== Result Section ===== */
+.result-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.result {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--deep-purple);
+  margin-top: 8px;
+}
+
+/* ===== History Section ===== */
+.history-section {
+  margin-top: 30px;
+}
+
+.history-box {
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--light-purple);
+  padding: 12px;
+  border-radius: var(--border-radius);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.history-box div {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-size: 14px;
+}
+
+.history-box div:last-child {
+  border-bottom: none;
+}
